@@ -1,6 +1,9 @@
-use crate::cli::{clear, input_int, input_str};
-use crate::json::{Scheduling, SchedulingTime, read_json, write_json};
-use crate::utils::{duration};
+use std::thread::{sleep};
+use std::time::{Duration};
+
+use crate::cli::{clear, input_int, input_scheduling};
+use crate::json::{Scheduling, read_json, write_json};
+use crate::menu::view_data;
 
 pub fn view() {
   clear();
@@ -8,40 +11,25 @@ pub fn view() {
   println!(" ===============");
   println!(" Jadwal Kegiatan");
   println!(" ===============");
-  
-  match read_json() {
-    Ok(schedulings) => {
-      
-      let mut index: u32 = 0;
-      
-      for scheduling in &schedulings {
-        index += 1;
-        
-        let space = " ".repeat(index.to_string().len());
 
-        let start_time = &scheduling.start_time;
-        let end_time = &scheduling.end_time;
-        let [hour, minute] = duration(start_time, end_time);
+  let schedulings: Vec<Scheduling> = read_json().unwrap_or_else(|_| Vec::new());
 
-        let start_time_formatted = format!("{}:{:02}", start_time.hour, start_time.minute);
-        let end_time_formatted = format!("{}:{:02}", end_time.hour, end_time.minute);
-        let duration_formatted = if hour > 0 && minute > 0 {
-            format!("{} Jam {} Menit", hour, minute)
-        } else if hour > 0 && minute == 0 {
-            format!("{} Jam", hour)
-        } else {
-          format!("{} Menit", minute)
-        };
-          
-        println!(" [{}]. Kegiatan : {}", index, scheduling.event);
-        println!("    {} Waktu    : {} - {}", space, start_time_formatted, end_time_formatted);
-        println!("    {} Durasi   : {}\n", space, duration_formatted);
-      }
-    },
-    Err(e) => {
-      println!(" {}", e)
-    }
+  if schedulings.len() == 0 {
+    println!("\n > Jadwal belum tersedia!");
+
+    sleep(Duration::from_millis(2000));
+    
+    return;
   }
+  
+  let mut index: u32 = 0;
+  
+  for scheduling in &schedulings {
+    index += 1;
+    
+    view_data(index, scheduling);
+  }
+  
 }
 
 pub fn add() {
@@ -50,23 +38,8 @@ pub fn add() {
   println!(" ======================");
   println!(" Tambah Jadwal Kegiatan");
   println!(" ======================");
-
-  println!(" [Informasi Kegiatan]");
-  let event_name = input_str(" Nama");
-
-  println!("\n [Waktu Mulai]");
-  let start_hour = input_int(" Jam", 0, 24);
-  let start_minute = input_int(" Menit", 0, 59);
-
-  println!("\n [Waktu Selesai]");
-  let end_hour = input_int(" Jam", 0, 24);
-  let end_minute = input_int(" Menit", 0, 59);
   
-  let scheduling = Scheduling {
-    event: String::from(&event_name),
-    start_time: SchedulingTime { hour: start_hour, minute: start_minute },
-    end_time: SchedulingTime { hour: end_hour, minute: end_minute }
-  };
+  let scheduling = input_scheduling();
 
   let mut schedulings = read_json().unwrap_or_else(|_| Vec::new());
 
@@ -79,6 +52,48 @@ pub fn add() {
   }
 }
 
-pub fn edit() {}
+pub fn edit() {
+  clear();
+
+  println!(" =================");
+  println!(" == Edit Jadwal ==");
+  println!(" =================\n");
+
+  let mut schedulings: Vec<Scheduling> = read_json().unwrap_or_else(|_| Vec::new());
+
+  if schedulings.len() == 0 {
+    println!(" > Jadwal belum tersedia!");
+
+    sleep(Duration::from_millis(2000));
+    
+    return;
+  }
+
+  let mut index: u32 = 0;
+
+  for scheduling in &schedulings {
+    index += 1;
+
+    view_data(index, scheduling);
+  }
+
+  println!(" == Pilih Jadwal ==");
+
+  let selected = input_int("Jadwal Dipilih", 1, schedulings.len() as u8);
+
+  println!("");
+
+  let scheduling = input_scheduling();
+
+  schedulings[(selected - 1) as usize] = scheduling;
+
+  if let Err(_e) = write_json(&schedulings) {
+    println!("\n > Jadwal gagal di edit!");
+  } else {
+    println!("\n > Jadwal berhasil di edit!");
+  }
+
+  sleep(Duration::from_millis(2000));
+}
 
 pub fn delete() {}

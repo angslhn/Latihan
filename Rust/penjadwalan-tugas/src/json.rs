@@ -17,7 +17,7 @@ pub struct SchedulingTime {
   pub minute: u8,
 }
 
-const JSON_PATH: &str = "./data/scheduling.json";
+const JSON_PATH: &str = "./data/schedulings.json";
 
 pub fn read_json() -> Result<Vec<Scheduling>, Box<dyn Error>> {
   let file_path: &Path = Path::new(JSON_PATH);
@@ -32,7 +32,7 @@ pub fn read_json() -> Result<Vec<Scheduling>, Box<dyn Error>> {
 pub fn write_json(schedulings: &Vec<Scheduling>) -> Result<(), Box<dyn Error>> {
   let file_path: &Path = Path::new(JSON_PATH);
 
-  let json_content = serde_json::to_string_pretty(&schedulings)?;
+  let json_content: String = serde_json::to_string_pretty(&schedulings)?;
 
   fs::write(file_path, json_content)?;
 

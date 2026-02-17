@@ -2,6 +2,8 @@ use std::io;
 use std::io::Write;
 use std::process::Command;
 
+use crate::json::{Scheduling, SchedulingTime};
+
 pub fn clear() {
     if cfg!(target_os = "windows") {
         let _ = Command::new("cmd").args(["/c", "cls"]).status();
@@ -68,29 +70,31 @@ pub fn input_int(label: &str, min: u8, max: u8) -> u8 {
     }
 }
 
+/*
 pub fn confirm(label: &str) -> String {
     let mut buffer = String::new();
-
+    
     loop {  
         print!(" {} (Y/N) = ", label);
-
+        
         io::stdout().flush().unwrap();
 
         buffer.clear();
-
+        
         if io::stdin().read_line(&mut buffer).is_err() {
             continue;
         }
-
+        
         let value = buffer.trim().to_uppercase();
         
         if ["Y", "N"].contains(&value.as_str()) {
             return value;
         }
-
+        
         reset();
     }
 }
+*/
 
 pub fn input_str(label: &str) -> String {
     print!(" {} = ", label);
@@ -103,3 +107,22 @@ pub fn input_str(label: &str) -> String {
 
     return buffer.trim().to_string();
 }
+
+pub fn input_scheduling() -> Scheduling {
+  println!(" [Informasi Kegiatan]");
+  let event_name = input_str(" Nama");
+
+  println!("\n [Waktu Mulai]");
+  let start_hour = input_int(" Jam", 0, 24);
+  let start_minute = input_int(" Menit", 0, 59);
+
+  println!("\n [Waktu Selesai]");
+  let end_hour = input_int(" Jam", 0, 24);
+  let end_minute = input_int(" Menit", 0, 59);
+
+  return Scheduling {
+    event: String::from(&event_name),
+    start_time: SchedulingTime { hour: start_hour, minute: start_minute },
+    end_time: SchedulingTime { hour: end_hour, minute: end_minute }
+  };
+} 
