@@ -2,20 +2,38 @@ mod cli;
 mod menu;
 mod core;
 mod json;
-mod storage;
 mod utils;
 
-use core::{main_menu, scheduling_menu};
+use cli::{clear, input_option}; 
+use core::{view, add, edit, delete};
+use menu::{view_main, view_scheduling};
 
 fn main() {
+    let mut selected: u8;
+
     loop {
-        let selected: u8 = main_menu();
+        clear();
+        view_main();
         
-        scheduling_menu(&selected);
-        
-        if [2, 5].contains(&selected) {
-            println!("\n > Keluar dari program");
-            break
+        selected = input_option("Pilih Menu", 2);
+
+        if selected == 1 {
+            loop {   
+                clear();
+                view_scheduling();
+
+                selected = input_option("Pilih Menu", 5);
+
+                match selected {
+                    1 => { view(); }, 
+                    2 => { add(); }, 
+                    3 => { edit(); }, 
+                    4 => { delete(); }, 
+                    _ => { break; } 
+                }
+            }
+        } else {
+            break;
         }
     }
 }

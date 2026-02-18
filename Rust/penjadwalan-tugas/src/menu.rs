@@ -1,14 +1,19 @@
-use crate::{json::Scheduling, utils::duration};
+use crate::utils::duration;
+use crate::json::Scheduling; 
 
 pub fn view_main() {
+    println!(" =================");
     println!(" == Menu Utama ===");
+    println!(" =================");
     println!("  1. Mulai");
     println!("  2. Keluar");
     println!(" =================")
 }
 
 pub fn view_scheduling() {
+    println!(" =======================");
     println!(" == Menu Penjadwalan ===");
+    println!(" =======================");
     println!("  1. Lihat Jadwal");
     println!("  2. Tambah Jadwal");
     println!("  3. Edit Jadwal");
@@ -34,7 +39,7 @@ pub fn view_data(index: u32, scheduling: &Scheduling) {
       format!("{} Menit", minute)
     };
       
-    println!(" [{}]. Kegiatan : {}", index, scheduling.event);
-    println!("    {} Waktu    : {} - {}", space, start_time_formatted, end_time_formatted);
-    println!("    {} Durasi   : {}\n", space, duration_formatted);
+    println!("  [{}]. Kegiatan : {}", index, scheduling.event);
+    println!("     {} Waktu    : {} - {}", space, start_time_formatted, end_time_formatted);
+    println!("     {} Durasi   : {}\n", space, duration_formatted);
 }
